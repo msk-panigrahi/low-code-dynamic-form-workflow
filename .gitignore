@@ -1,0 +1,40 @@
+# Environment files
+.env
+.env.*
+backend/.env
+frontend/.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+*.egg
+
+# Node
+node_modules/
+
+# Build artifacts
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+
+# Runtime uploaded files
+backend/uploads/*
+
+# Backup of previous Infosys repository
+.git-infosys-backup/

@@ -1,0 +1,73 @@
+# ==============================================================
+# Dynamic Form Workflow - Docker Compose
+# Services: PostgreSQL + FastAPI Backend + React Frontend
+# ==============================================================
+
+version: "3.9"
+
+services:
+  # -----------------------------------------------------------
+  # PostgreSQL Database
+  # -----------------------------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: dynamic-forms-db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-dynamic_forms_db}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-dynamic_forms_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # -----------------------------------------------------------
+  # FastAPI Backend
+  # -----------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dynamic-forms-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Database connection — uses the Docker service name "db" as hostname
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-dynamic_forms_db}
+      SQLALCHEMY_ECHO: ${SQLALCHEMY_ECHO:-False}
+      DEBUG: ${DEBUG:-False}
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-here}
+    ports:
+      - "8000:8000"
+
+  # -----------------------------------------------------------
+  # React Frontend (Vite)
+  # -----------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    container_name: dynamic-forms-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+
+# -----------------------------------------------------------
+# Persistent Volumes
+# -----------------------------------------------------------
+volumes:
+  postgres_data:
+    name: dynamic-forms-postgres-data
