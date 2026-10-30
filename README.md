@@ -515,8 +515,8 @@ Docker is optional.
 ### 1. Clone the Repository
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd <YOUR_REPOSITORY_DIRECTORY>
+git clone https://github.com/msk-panigrahi/low-code-dynamic-form-workflow.git
+cd low-code-dynamic-form-workflow
 ```
 
 ### 2. Configure PostgreSQL
